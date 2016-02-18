@@ -1,4 +1,5 @@
 /node_modules/*
+.DS_Store
 6.01.svg
 smooth.svg
 test123.svg
