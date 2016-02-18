@@ -12,7 +12,8 @@
     "svg-path-shapes": "0.0.2",
     "normalize-svg-path": "0.1.0",
     "parse-svg-path": "0.1.1",
+    "simplify-js": "1.2.1",
     "lodash": "4.5.0",
-    "simplify-js": "1.2.1"
+    "cheerio": "0.20.0",    
   }
 }
