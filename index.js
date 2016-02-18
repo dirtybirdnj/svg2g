@@ -45,8 +45,9 @@ function wrapPath(pathData){
 
 	var strOutput = '<path d="'
 
-	_(pathData).forEach(function(element){
-		strOutput += ' M ' + element.x + ',' + element.y + ' '
+	strOutput += 'M' + pathData[0].x + ',' + pathData[0].y + ' '
+	_(pathData.slice(1)).forEach(function(element){
+		strOutput += ' L' + element.x + ',' + element.y + ' '
 	})
 
 	strOutput += '" stroke="#000000" fill="none"/>';
@@ -58,13 +59,9 @@ function wrapPath(pathData){
 function wrapSVG(paths){
 
 	var strOutput = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';	
-	strOutput += '<svg id="workspace" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 531 360" version="1.1">';
-
-	console.log('paths!',paths)
+	strOutput += '<svg id="workspace" xmlns="http://www.w3.org/2000/svg" version="1.1">';
 
 		_(paths).forEach(function(element){
-			
-			console.log(element)
 			strOutput += element
 		})
 
