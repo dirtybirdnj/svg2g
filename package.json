@@ -9,11 +9,12 @@
   "author": "Mat Gilbert <matgilbert@gmail.com> (http://www.matgilbert.com)",
   "license": "ISC",
   "dependencies": {
-    "svg-path-shapes": "0.0.2",
+    "cheerio": "0.20.0",
+    "lodash": "4.5.0",
     "normalize-svg-path": "0.1.0",
     "parse-svg-path": "0.1.1",
     "simplify-js": "1.2.1",
-    "lodash": "4.5.0",
-    "cheerio": "0.20.0"    
+    "svg-path-shapes": "0.0.2",
+    "throw": "^1.1.0"
   }
 }

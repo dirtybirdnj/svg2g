@@ -5,11 +5,24 @@ var parse = require('parse-svg-path')
 var _ = require('lodash')
 var simplify = require('simplify-js')
 var cheerio = require('cheerio')
+var minimist = require('minimist')
+var thr = require('throw')
 var fs = require('fs');
 
+//Getting the filename arg
+var argv = minimist(process.argv.slice(2))
+var argv = require('minimist')(process.argv.slice(2))
+var args = argv._
+var opts = _.omit(argv, '_')
+
+var fileName = args[0];
+
+if(fileName == '' || fileName == undefined) thr('Enter a relative file path');
+
+var bezierOutput = (opts.b ? true : false)
 
 //Hardcoded filepath, to be replaced with command line arguments
-var path = __dirname + '/6.01.svg';
+var path = __dirname + '/' + fileName;
 
 var svgPaths = parseSVGPaths(path)
 var seperatedPaths = seperatePaths(svgPaths);
@@ -32,7 +45,15 @@ function seperatePaths(paths){
 				return items
 			}, [])		
 
-			pathElements.push(wrapPath(pathPoints))
+			if(bezierOutput){
+
+				pathElements.push(wrapPath(normalize(pathPoints)))				
+
+			} else {
+
+				pathElements.push(wrapPath(pathPoints))
+
+			}
 
 		})
 
