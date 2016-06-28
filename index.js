@@ -6,6 +6,7 @@ var _ = require('lodash')
 var simplify = require('simplify-js')
 var cheerio = require('cheerio')
 var minimist = require('minimist')
+var abs = require('abs-svg-path')
 var thr = require('throw')
 var fs = require('fs');
 
@@ -45,15 +46,7 @@ function seperatePaths(paths){
 				return items
 			}, [])		
 
-			if(bezierOutput){
-
-				pathElements.push(wrapPath(normalize(pathPoints)))				
-
-			} else {
-
-				pathElements.push(wrapPath(pathPoints))
-
-			}
+			pathElements.push(wrapPath(pathPoints))
 
 		})
 
@@ -62,18 +55,18 @@ function seperatePaths(paths){
 	return pathElements
 }
 
+//Wraps the pathData array of x,y coords in a line or bezier <path> element
 function wrapPath(pathData){
 
-	var strOutput = '<path d="'
 
-	strOutput += 'M' + pathData[0].x + ',' + pathData[0].y + ' '
-	_(pathData.slice(1)).forEach(function(element){
-		strOutput += ' L' + element.x + ',' + element.y + ' '
-	})
+	var linePathString = pointPath(pathData);
 
-	strOutput += '" stroke="#000000" fill="none"/>';
+	//console.log(pathData);
+	//console.log(pathPointsToBezier(pathDataString))
 
-	return strOutput
+	var pathDataString = (bezierOutput ? pathStringToBezier(linePathString) : linePathString)
+
+	return '<path d="' + pathDataString + '" stroke="#000000" fill="none"/>';
 
 }
 
@@ -102,6 +95,38 @@ function parseSVGPaths(filepath){
 	}, [])
 
 	return paths
+}
+
+function pointPath(pathPointsArr){
+
+	var pathDataString = 'M ' + pathPointsArr[0].x + ' ' + pathPointsArr[0].y + ' '
+	_(pathPointsArr.slice(1)).forEach(function(element){
+		
+		pathDataString += ' L ' + element.x + ' ' + element.y + ' '
+	
+	})
+
+	return pathDataString
+}
+
+function pathStringToBezier(pathPointString){
+
+	var pathPieces = _.without(_.split(pathPointString,' '),'')
+	var pathChunks = abs(_.chunk(pathPieces,3))
+	var bezierPathArr = normalize(pathChunks)
+
+	var bezierPathString = '';
+
+	_(bezierPathArr).forEach(function(element){
+
+		bezierPathString += ' ' + _.join(element,' ')
+
+	});
+
+	//var bezierPathString = _.join([bezierPathArr],' ')
+	//return _.replace(bezierPathString,',',' ')
+	return bezierPathString
+
 }
 
 //Original Sketch / Mockup, 

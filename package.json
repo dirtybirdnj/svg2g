@@ -9,6 +9,7 @@
   "author": "Mat Gilbert <matgilbert@gmail.com> (http://www.matgilbert.com)",
   "license": "ISC",
   "dependencies": {
+    "abs-svg-path": "^0.1.1",
     "cheerio": "0.20.0",
     "lodash": "4.5.0",
     "normalize-svg-path": "0.1.0",
