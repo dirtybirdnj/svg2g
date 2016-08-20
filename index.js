@@ -18,18 +18,18 @@ var opts = _.omit(argv, '_')
 
 var fileName = args[0];
 
-if(fileName == '' || fileName == undefined) thr('Enter a relative file path');
+if(fileName == '' || fileName == undefined) thr('Enter a relative file path')
 
 var bezierOutput = (opts.b ? true : false)
 
 //Hardcoded filepath, to be replaced with command line arguments
-var path = __dirname + '/' + fileName;
+var path = __dirname + '/' + fileName
 
 var svgPaths = parseSVGPaths(path)
-var seperatedPaths = seperatePaths(svgPaths);
-console.log(wrapSVG(seperatedPaths));
+var seperatedPaths = seperatePaths(svgPaths)
+console.log(wrapSVG(seperatedPaths))
 
-//Takes in a multi-shape path and 
+//Takes in a multi-shape path and outputs an array of paths
 function seperatePaths(paths){
 
 	var pathElements = [];
@@ -59,29 +59,29 @@ function seperatePaths(paths){
 function wrapPath(pathData){
 
 
-	var linePathString = pointPath(pathData);
+	var linePathString = pointPath(pathData)
 
 	//console.log(pathData);
 	//console.log(pathPointsToBezier(pathDataString))
 
 	var pathDataString = (bezierOutput ? pathStringToBezier(linePathString) : linePathString)
 
-	return '<path d="' + pathDataString + '" stroke="#000000" fill="none"/>';
+	return '<path d="' + pathDataString + '" stroke="#000000" fill="none"/>'
 
 }
 
 function wrapSVG(paths){
 
-	var strOutput = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';	
-	strOutput += '<svg id="workspace" xmlns="http://www.w3.org/2000/svg" version="1.1">';
+	var strOutput = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+	strOutput += '<svg id="workspace" xmlns="http://www.w3.org/2000/svg" version="1.1">'
 
 		_(paths).forEach(function(element){
 			strOutput += element
 		})
 
-	strOutput += '</svg>';
+	strOutput += '</svg>'
 
-	return strOutput;
+	return strOutput
 
 }
 
@@ -115,7 +115,7 @@ function pathStringToBezier(pathPointString){
 	var pathChunks = abs(_.chunk(pathPieces,3))
 	var bezierPathArr = normalize(pathChunks)
 
-	var bezierPathString = '';
+	var bezierPathString = ''
 
 	_(bezierPathArr).forEach(function(element){
 
