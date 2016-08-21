@@ -78,17 +78,63 @@ var coloredPaths = distributePaths(seperatedPaths,gellyrollColors)
 //Output the final SVG
 console.log(wrapColoredSVG(coloredPaths));
 
+
+// Expects output from distributePaths()
+function wrapColoredSVG(coloredPaths){
+
+	// console.log(coloredPaths)
+	// console.log('colored paths ahoy')
+	// process.exit()
+
+	let documentPaths = []
+	_.forEach(coloredPaths,function(path,color){
+
+		let newPath = wrapPathData(path,color)
+
+		// console.log(newPath.substring(0,100))
+		// console.log('line 91')
+		// process.exit()
+
+		documentPaths.push(newPath)
+
+		//console.log(newPath)
+		//process.exit(1);
+
+	})
+
+	return wrapSVG(documentPaths)
+
+}
+
+
 //Take in an array of paths, output N paths based on N colors.length
 function distributePaths(paths,colors){
 
 	var pathColors = {}
 
+	//Create keyed arrays for array pushes
+	_(colors).forEach((color) => {
+
+			pathColors[color] = []
+		}
+	)
+
 	_(paths).forEach(function(path){
 
 		var randomColor = colors[pickRandomColor(colors)]
-		pathColors[randomColor] = pathColors[randomColor] + ' ' + path
+
+		pathColors[randomColor].push(path) //= pathColors[randomColor] += path
+
+		// console.log(pathColors)
+		// console.log(randomColor)
+		// process.exit()
 
 	});
+
+
+		// console.log(pathColors)
+		// console.log('pathColors')
+		// process.exit()
 
 	return pathColors
 }
@@ -104,6 +150,7 @@ function pickRandomColor(colors) {
     return result;
 }
 
+//#TODO
 //Take in an array of paths, return a single compound path of all elements
 function flattenPaths(paths){
 
@@ -139,42 +186,45 @@ function seperatePaths(paths){
 				return items
 			}, [])		
 
+			var newPointPath = pointPath(pathPoints)
+
+			// console.log(newPointPath.substring(0,100))
+			// console.log('new shit')
+			// process.exit()
+
+
 			//pathElements.push(wrapPath(pathPoints))
-			pathElements.push(pointPath(pathPoints))
+			pathElements.push(newPointPath)
 
 		})
 
-	})	
+	})
+
+	//console.log(newPointPath.substring(0,100))
+	// console.log(pathElements)
+	// console.log('outputing pathElements')
+	// process.exit()		
 
 	return pathElements
 }
 
-
-// Expects output from distributePaths()
-function wrapColoredSVG(coloredPaths){
-
-	let documentPaths = []
-	_.forEach(coloredPaths,function(path,color){
-
-		let newPath = wrapPathData(path,color)
-		documentPaths.push(newPath)
-
-		//console.log(newPath)
-		//process.exit(1);
-
-	})
-
-	return wrapSVG(documentPaths)
-
-}
-
+//Newer multicolor path wrapper
 //Wraps the pathData array of x,y coords in a line or bezier <path> element
 function wrapPathData(pathData, color){
 
-	return '<path d="' + pathData + '" stroke="#' + color + '" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke_width="5"/>'
+
+		// console.log(pathData.substring(0,100))
+		// console.log('wrapPathData')
+		// process.exit()
+
+	return '<path d="' + pathData + '" stroke="#' + color + '" fill="none" stroke_width="5"/>'
+
+	//Extra unnecessary linejoin attributes
+	//return '<path d="' + pathData + '" stroke="#' + color + '" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke_width="5"/>'
 
 }
 
+//Older path wrapping implementation
 //Wraps the pathData array of x,y coords in a line or bezier <path> element
 function wrapPath(pathData, color){
 
@@ -186,14 +236,17 @@ function wrapPath(pathData, color){
 
 	var pathDataString = (bezierOutput ? pathStringToBezier(linePathString) : linePathString)
 
-	return '<path d="' + pathDataString + '" stroke="#' + color + '" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke_width="5"/>'
+	return '<path d="' + pathDataString + '" stroke="#' + color + '" fill="none" stroke_width="5"/>'
+
+	//Extra linejoin crap
+	//return '<path d="' + pathDataString + '" stroke="#' + color + '" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke_width="5"/>'
 
 }
 
 function wrapSVG(paths){
 
 	var strOutput = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-	strOutput += '<svg id="workspace" xmlns="http://www.w3.org/2000/svg" version="1.1">'
+	strOutput += '<svg id="workspace" width="auto" height="auto" xmlns="http://www.w3.org/2000/svg" version="1.1">'
 
 		_(paths).forEach(function(element){
 			strOutput += element
@@ -209,10 +262,10 @@ function wrapSVG(paths){
 //Composes an SVG path from coordinates
 function pointPath(pathPointsArr){
 
-	var pathDataString = 'M ' + pathPointsArr[0].x + ' ' + pathPointsArr[0].y + ' '
+	var pathDataString = 'M' + pathPointsArr[0].x + ',' + pathPointsArr[0].y //+ ' '
 	_(pathPointsArr.slice(1)).forEach(function(element){
 		
-		pathDataString += ' L ' + element.x + ' ' + element.y + ' '
+		pathDataString += ' L' + element.x + ',' + element.y //+ ' '
 	
 	})
 
