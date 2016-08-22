@@ -29,7 +29,7 @@ var svgPaths = parseSVGPaths(path)
 var seperatedPaths = seperatePaths(svgPaths)
 console.log(wrapSVG(seperatedPaths))
 
-//Takes in a multi-shape path and outputs an array of paths
+//Takes in multi-shape path(s) and outputs an array of paths
 function seperatePaths(paths){
 
 	var pathElements = [];
@@ -38,19 +38,38 @@ function seperatePaths(paths){
 
 		_(shapes(layer)).forEach(function(shape){
 
-			var pathPoints = parse(shape)
 
 			var pathPoints = _.reduce(parse(shape), function (items, points) {
-				var values = points.slice(1)
-				items.push({ x: values[0], y: values[1]})
-				return items
-			}, [])		
 
-			pathElements.push(wrapPath(pathPoints))
+			//if(points[0] == 'M') items.push({ x: values[0], y: values[1]})
+			if(points[0].toUpperCase() == 'M'){
 
-		})
+				//console.log('m path')
+				items.push('M' + points.slice(1))
 
-	})	
+			}
+			else if(points[0].toUpperCase() == 'C'){
+				
+				//console.log('c path')
+				items.push('C' + points.slice(1))
+
+			}			
+			else if(points[0].toUpperCase() == 'Z') items.push(['Z'])	
+			else {
+
+				console.log('Unsupported SVG path token')
+				console.log(points)
+				process.exit()
+
+			}
+			return items
+			}, [])
+
+			pathElements.push(_.join(pathPoints,' '))
+
+		}) // end foreach multipath shapes
+
+	}) // end foreach path	
 
 	return pathElements
 }
@@ -70,13 +89,19 @@ function wrapPath(pathData){
 
 }
 
+function simpleWrapPath(pathString){
+
+	return '<path d="' + pathString + '" stroke="#000000" fill="none"/>'
+
+}
+
 function wrapSVG(paths){
 
 	var strOutput = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
 	strOutput += '<svg id="workspace" xmlns="http://www.w3.org/2000/svg" version="1.1">'
 
 		_(paths).forEach(function(element){
-			strOutput += element
+			strOutput += simpleWrapPath(element)
 		})
 
 	strOutput += '</svg>'
@@ -99,12 +124,22 @@ function parseSVGPaths(filepath){
 
 function pointPath(pathPointsArr){
 
+	console.log(pathPointsArr)
+	process.exit()
+
 	var pathDataString = 'M ' + pathPointsArr[0].x + ' ' + pathPointsArr[0].y + ' '
 	_(pathPointsArr.slice(1)).forEach(function(element){
+
+		console.log('element')
+		console.log(element)
 		
 		pathDataString += ' L ' + element.x + ' ' + element.y + ' '
 	
 	})
+
+	console.log(pathDataString)
+	console.log('debugg')
+	process.exit()
 
 	return pathDataString
 }
@@ -128,32 +163,3 @@ function pathStringToBezier(pathPointString){
 	return bezierPathString
 
 }
-
-//Original Sketch / Mockup, 
-//Includes non-essential simplification and bezier conversion
-
-// _(traces).forEach(function(layer){
-// 	_(shapes(layer)).forEach(function(shape){
-
-// 		var pathPoints = parse(shape)
-
-// 		var pathPoints = _.reduce(parse(shape), function (items, points) {
-// 			var values = points.slice(1)
-// 			items.push({ x: values[0], y: values[1]})
-// 			return items
-// 		}, [])		
-
-// 		var simplifiedPath = simplify(pathPoints,.1,true)
-// 		var bezierPath = normalize(simplifiedPath)		
-
-// 		strOutput += '<path d="'
-// 		strOutput += 'M' + bezierPath[0].x + ',' + bezierPath[0].y + ' '
-
-// 		_(bezierPath.slice(1)).forEach(function(element){
-// 			strOutput += ' L ' + element.x + ',' + element.y + ' '
-// 		})
-
-// 		strOutput += '" stroke="#000000" fill="none"/>';
-
-// 	})
-// })
