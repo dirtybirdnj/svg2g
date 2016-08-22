@@ -13,43 +13,23 @@ var thr = require('throw')
 var fs = require('fs');
 
 // original object syntax, could not get this to work
-// var gellyrollColors = {
-
-// 	blue_36 : { 'hex' : '2123FC' },
-// 	blue_138 : { 'hex' : '00014A' },
-// 	blue_436 : { 'hex' : '212EC1' },
-// 	blue_738 : { 'hex' : '1F873A' },
-// 	green_429: { 'hex' : '44FF74' },
-// 	green_427 : { 'hex' : '074726' },
-// 	green_M29 : { 'hex' : '126935' },
-// 	purple_724 : { 'hex' : 'CAA7DE' },
-// 	purple_24 : { 'hex' : '6A1A94' },
-// 	gold_703 : { 'hex' :'D7DEA7' },
-// 	yellow_402 : { 'hex' : 'DFFF26' },
-// 	orange_405 : { 'hex' : 'FF8900' },
-// 	pink_418  : { 'hex' : 'FF478C' },
-// 	black_49 : { 'hex' : '000000' },
-// 	red_19: { 'hex' : 'A00000' },
-// }
-
-//More natural array syntax
 var gellyrollColors = [
 
-	'2123FC', //blue_36 
-	'00014A', //blue_138 
-	'212EC1', //blue_436
-	'1F873A', // blue_738
-	'44FF74', // green_429
-	'074726', // green_427
-	'126935', // green_M29
-	'CAA7DE', // purple_724
-	'6A1A94', // purple_24
-	'D7DEA7', // gold_703
-	'DFFF26', // yellow_402
-	'FF8900', // orange_405
-	'FF478C', // pink_418
-	'000000', // black_49
-	'A00000', // red_19
+	{ name: 'blue_36', hex : '2123FC' },
+	{ name: 'blue_138', hex : '00014A' },
+	{ name: 'blue_436',  hex : '212EC1' },
+	{ name: 'blue_738',  hex : '1F873A' },
+	{ name: 'green_429', hex : '44FF74' },
+	{ name: 'green_427', hex : '074726' },
+	{ name: 'green_M29', hex : '126935' },
+	{ name: 'purple_724',  hex : 'CAA7DE' },
+	{ name: 'purple_24', hex : '6A1A94' },
+	{ name: 'gold_703', hex :'D7DEA7' },
+	{ name: 'yellow_402', hex : 'DFFF26' },
+	{ name: 'orange_405', hex : 'FF8900' },
+	{ name: 'pink_418', hex : 'FF478C' },
+	{ name: 'black_49', hex : '000000' },
+	{ name: 'red_19', hex : 'A00000' },
 ]
 
 //Getting the filename arg
@@ -82,24 +62,19 @@ console.log(wrapColoredSVG(coloredPaths));
 // Expects output from distributePaths()
 function wrapColoredSVG(coloredPaths){
 
-	// console.log(coloredPaths)
-	// console.log('colored paths ahoy')
-	// process.exit()
-
 	let documentPaths = []
+
+	console.log(coloredPaths)
+	process.exit()
+
 	_.forEach(coloredPaths,function(path,color){
 
+		console.log(path.length)
+		process.exit()
+
+
 		let newPath = wrapPathData(path,color)
-
-		// console.log(newPath.substring(0,100))
-		// console.log('line 91')
-		// process.exit()
-
 		documentPaths.push(newPath)
-
-		//console.log(newPath)
-		//process.exit(1);
-
 	})
 
 	return wrapSVG(documentPaths)
@@ -115,15 +90,21 @@ function distributePaths(paths,colors){
 	//Create keyed arrays for array pushes
 	_(colors).forEach((color) => {
 
-			pathColors[color] = []
+			pathColors[color.name] = []
 		}
 	)
 
 	_(paths).forEach(function(path){
 
+		// console.log(path)
+		// process.exit()
+
 		var randomColor = colors[pickRandomColor(colors)]
 
-		pathColors[randomColor].push(path) //= pathColors[randomColor] += path
+		// console.log(randomColor)
+		// process.exit()
+
+		pathColors[randomColor.name].push(path) //= pathColors[randomColor] += path
 
 		// console.log(pathColors)
 		// console.log(randomColor)
@@ -169,7 +150,8 @@ function parseSVGPaths(filepath){
 	return paths
 }
 
-//Takes in a multi-shape path and outputs an array of paths
+
+//Takes in multi-shape path(s) and outputs an array of paths
 function seperatePaths(paths){
 
 	var pathElements = [];
@@ -178,35 +160,81 @@ function seperatePaths(paths){
 
 		_(shapes(layer)).forEach(function(shape){
 
-			var pathPoints = parse(shape)
 
 			var pathPoints = _.reduce(parse(shape), function (items, points) {
-				var values = points.slice(1)
-				items.push({ x: values[0], y: values[1]})
-				return items
-			}, [])		
 
-			var newPointPath = pointPath(pathPoints)
+			//if(points[0] == 'M') items.push({ x: values[0], y: values[1]})
+			if(points[0].toUpperCase() == 'M'){
 
-			// console.log(newPointPath.substring(0,100))
-			// console.log('new shit')
-			// process.exit()
+				//console.log('m path')
+				items.push('M' + points.slice(1))
 
+			}
+			else if(points[0].toUpperCase() == 'C'){
+				
+				//console.log('c path')
+				items.push('C' + points.slice(1))
 
-			//pathElements.push(wrapPath(pathPoints))
-			pathElements.push(newPointPath)
+			}			
+			else if(points[0].toUpperCase() == 'Z') items.push(['Z'])	
+			else {
 
-		})
+				console.log('Unsupported SVG path token')
+				console.log(points)
+				process.exit()
 
-	})
+			}
+			return items
+			}, [])
 
-	//console.log(newPointPath.substring(0,100))
-	// console.log(pathElements)
-	// console.log('outputing pathElements')
-	// process.exit()		
+			pathElements.push(_.join(pathPoints,' '))
+
+		}) // end foreach multipath shapes
+
+	}) // end foreach path	
 
 	return pathElements
 }
+
+
+// //Takes in a multi-shape path and outputs an array of paths
+// function seperatePaths(paths){
+
+// 	var pathElements = [];
+
+// 	_(paths).forEach(function(layer){
+
+// 		_(shapes(layer)).forEach(function(shape){
+
+// 			var pathPoints = parse(shape)
+
+// 			var pathPoints = _.reduce(parse(shape), function (items, points) {
+// 				var values = points.slice(1)
+// 				items.push({ x: values[0], y: values[1]})
+// 				return items
+// 			}, [])		
+
+// 			var newPointPath = pointPath(pathPoints)
+
+// 			// console.log(newPointPath.substring(0,100))
+// 			// console.log('new shit')
+// 			// process.exit()
+
+
+// 			//pathElements.push(wrapPath(pathPoints))
+// 			pathElements.push(newPointPath)
+
+// 		})
+
+// 	})
+
+// 	//console.log(newPointPath.substring(0,100))
+// 	// console.log(pathElements)
+// 	// console.log('outputing pathElements')
+// 	// process.exit()		
+
+// 	return pathElements
+// }
 
 //Newer multicolor path wrapper
 //Wraps the pathData array of x,y coords in a line or bezier <path> element
