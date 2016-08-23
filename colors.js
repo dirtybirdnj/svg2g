@@ -64,16 +64,11 @@ function wrapColoredSVG(coloredPaths){
 
 	let documentPaths = []
 
-	console.log(coloredPaths)
-	process.exit()
+	_.forEach(coloredPaths,function(coloredPath){
 
-	_.forEach(coloredPaths,function(path,color){
+		let pathString = _.join(coloredPath.paths,' ')
+		let newPath = wrapPathString(pathString,coloredPath.color)
 
-		console.log(path.length)
-		process.exit()
-
-
-		let newPath = wrapPathData(path,color)
 		documentPaths.push(newPath)
 	})
 
@@ -91,31 +86,18 @@ function distributePaths(paths,colors){
 	_(colors).forEach((color) => {
 
 			pathColors[color.name] = []
+			//Pass along the name AND hex code for composition later
+			pathColors[color.name].color = color
+			pathColors[color.name].paths = []
 		}
 	)
 
 	_(paths).forEach(function(path){
 
-		// console.log(path)
-		// process.exit()
-
 		var randomColor = colors[pickRandomColor(colors)]
-
-		// console.log(randomColor)
-		// process.exit()
-
-		pathColors[randomColor.name].push(path) //= pathColors[randomColor] += path
-
-		// console.log(pathColors)
-		// console.log(randomColor)
-		// process.exit()
+		pathColors[randomColor.name].paths.push(path) //= pathColors[randomColor] += path
 
 	});
-
-
-		// console.log(pathColors)
-		// console.log('pathColors')
-		// process.exit()
 
 	return pathColors
 }
@@ -129,13 +111,6 @@ function pickRandomColor(colors) {
            result = color;
          }
     return result;
-}
-
-//#TODO
-//Take in an array of paths, return a single compound path of all elements
-function flattenPaths(paths){
-
-
 }
 
 //Takes in an SVG file, returns an array of paths elements
@@ -175,7 +150,13 @@ function seperatePaths(paths){
 				//console.log('c path')
 				items.push('C' + points.slice(1))
 
-			}			
+			}
+			else if(points[0].toUpperCase() == 'L'){
+				
+				//console.log('c path')
+				items.push('L' + points.slice(1))
+
+			}							
 			else if(points[0].toUpperCase() == 'Z') items.push(['Z'])	
 			else {
 
@@ -197,58 +178,26 @@ function seperatePaths(paths){
 }
 
 
-// //Takes in a multi-shape path and outputs an array of paths
-// function seperatePaths(paths){
-
-// 	var pathElements = [];
-
-// 	_(paths).forEach(function(layer){
-
-// 		_(shapes(layer)).forEach(function(shape){
-
-// 			var pathPoints = parse(shape)
-
-// 			var pathPoints = _.reduce(parse(shape), function (items, points) {
-// 				var values = points.slice(1)
-// 				items.push({ x: values[0], y: values[1]})
-// 				return items
-// 			}, [])		
-
-// 			var newPointPath = pointPath(pathPoints)
-
-// 			// console.log(newPointPath.substring(0,100))
-// 			// console.log('new shit')
-// 			// process.exit()
-
-
-// 			//pathElements.push(wrapPath(pathPoints))
-// 			pathElements.push(newPointPath)
-
-// 		})
-
-// 	})
-
-// 	//console.log(newPointPath.substring(0,100))
-// 	// console.log(pathElements)
-// 	// console.log('outputing pathElements')
-// 	// process.exit()		
-
-// 	return pathElements
-// }
-
 //Newer multicolor path wrapper
 //Wraps the pathData array of x,y coords in a line or bezier <path> element
-function wrapPathData(pathData, color){
+function wrapPathString(pathString, color, stroke){
 
+	if(_.isUndefined(stroke)) stroke = 5
+	return '<path id="' + color.name + '" name="' + color.name + '" d="' + pathString + '" stroke="#' + color.hex + '" fill="none" stroke_width="' + stroke + '"/>'
+}
 
-		// console.log(pathData.substring(0,100))
-		// console.log('wrapPathData')
-		// process.exit()
+function wrapSVG(paths){
 
-	return '<path d="' + pathData + '" stroke="#' + color + '" fill="none" stroke_width="5"/>'
+	var strOutput = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+	strOutput += '<svg id="workspace" width="auto" height="auto" xmlns="http://www.w3.org/2000/svg" version="1.1">'
 
-	//Extra unnecessary linejoin attributes
-	//return '<path d="' + pathData + '" stroke="#' + color + '" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke_width="5"/>'
+		_(paths).forEach(function(element){
+			strOutput += element
+		})
+
+	strOutput += '</svg>'
+
+	return strOutput
 
 }
 
@@ -270,22 +219,6 @@ function wrapPath(pathData, color){
 	//return '<path d="' + pathDataString + '" stroke="#' + color + '" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke_width="5"/>'
 
 }
-
-function wrapSVG(paths){
-
-	var strOutput = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-	strOutput += '<svg id="workspace" width="auto" height="auto" xmlns="http://www.w3.org/2000/svg" version="1.1">'
-
-		_(paths).forEach(function(element){
-			strOutput += element
-		})
-
-	strOutput += '</svg>'
-
-	return strOutput
-
-}
-
 
 //Composes an SVG path from coordinates
 function pointPath(pathPointsArr){

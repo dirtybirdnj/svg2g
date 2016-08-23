@@ -53,7 +53,13 @@ function seperatePaths(paths){
 				//console.log('c path')
 				items.push('C' + points.slice(1))
 
-			}			
+			}
+			else if(points[0].toUpperCase() == 'L'){
+				
+				//console.log('c path')
+				items.push('L' + points.slice(1))
+
+			}							
 			else if(points[0].toUpperCase() == 'Z') items.push(['Z'])	
 			else {
 
