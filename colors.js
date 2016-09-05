@@ -15,21 +15,21 @@ var fs = require('fs');
 // original object syntax, could not get this to work
 var gellyrollColors = [
 
-	{ name: 'blue_36', hex : '2123FC' },
-	{ name: 'blue_138', hex : '00014A' },
-	{ name: 'blue_436',  hex : '212EC1' },
-	{ name: 'blue_738',  hex : '1F873A' },
+	//{ name: 'blue_36', hex : '2123FC' },
+	//{ name: 'blue_138', hex : '00014A' },
+	//{ name: 'blue_436',  hex : '212EC1' },
+	//{ name: 'blue_738',  hex : '1F873A' },
 	{ name: 'green_429', hex : '44FF74' },
 	{ name: 'green_427', hex : '074726' },
 	{ name: 'green_M29', hex : '126935' },
 	{ name: 'purple_724',  hex : 'CAA7DE' },
-	{ name: 'purple_24', hex : '6A1A94' },
-	{ name: 'gold_703', hex :'D7DEA7' },
+	//{ name: 'purple_24', hex : '6A1A94' },
+	//{ name: 'gold_703', hex :'D7DEA7' },
 	{ name: 'yellow_402', hex : 'DFFF26' },
 	{ name: 'orange_405', hex : 'FF8900' },
 	{ name: 'pink_418', hex : 'FF478C' },
-	{ name: 'black_49', hex : '000000' },
-	{ name: 'red_19', hex : 'A00000' },
+	//{ name: 'black_49', hex : '000000' },
+	//{ name: 'red_19', hex : 'A00000' },
 ]
 
 //Getting the filename arg
