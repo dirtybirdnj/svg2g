@@ -10,15 +10,16 @@
   "license": "ISC",
   "dependencies": {
     "abs-svg-path": "^0.1.1",
-    "cheerio": "0.20.0",
-    "fill-path": "^1.0.2",
+    "cheerio": "^1.0.0-rc.10",
+    "fill-path": "^1.0.11",
     "js-clipper": "^1.0.1",
-    "lodash": "4.5.0",
-    "normalize-svg-path": "0.1.0",
-    "parse-svg-path": "0.1.1",
-    "simplify-js": "1.2.1",
+    "lodash": "4.17.21",
+    "minimist": "^1.2.6",
+    "normalize-svg-path": "1.1.0",
+    "parse-svg-path": "0.1.2",
+    "simplify-js": "1.2.4",
     "svg-path-shapes": "0.0.2",
     "svg-replace-bezier": "0.0.3",
-    "throw": "^1.1.0"
+    "throw": "^1.1.1"
   }
 }
