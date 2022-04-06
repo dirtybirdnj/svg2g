@@ -9,6 +9,8 @@ var minimist = require('minimist')
 var abs = require('abs-svg-path')
 var thr = require('throw')
 var fs = require('fs');
+const pointDistance = require("point-distance");
+const { count } = require('console')
 
 //Getting the filename arg
 var argv = minimist(process.argv.slice(2))
@@ -42,7 +44,8 @@ let groups = parseSVGGroups(filePath);
 let output = parseGroupPaths(groups);
 
 //console.log(groups);
-console.log(output);
+//console.log(output);
+console.log('done');
 
 
 //Old Logic Series
@@ -150,49 +153,138 @@ function parseSVGPaths(filePath){
 	return paths
 }
 
+//Takes in an array of path objects including first, last and coord pieces
+//For each element in the array (choose active shape, first item sequentially in list)
+//Store LAST point (x,y) of the active shape
+//Add LAST path to the top of the stack
+//Iterate through all other items
+//Compare the distance from last point of active shape to first/last of the next FIFO shape in the array
+//https://www.npmjs.com/package/point-distance
+//For the shape with the lowest distance score from ACTIVE LAST X,Y to NEXT SHAPE X,Y
+//Add shape to the top of the stack, set shape to be active shape, remove shape from array of items for next cycle
+
+function orderPaths(paths){
+
+  let newPathArray = [];
+
+  //let activePath = _.first(paths); //first path of pathArray
+  //_.drop(paths[0]); // remove first item
+
+  let activePath = paths[0];
+  let pathStack = _.without(paths, paths[0]);
+  let nextPath = findClosestPath(activePath, pathStack);
+
+
+
+
+
+}
+
+function findClosestPath(targetPath,pathArray){
+
+  let targetPathCoords = targetPath.first.split(',');
+  // let targetPathX = parseFloat(targetPathCoords[0]);
+  // let targetPathY = parseFloat(targetPathCoords[1]);
+
+  let targetXY = [parseFloat(targetPathCoords[0]), parseFloat(targetPathCoords[1])];
+
+  let pathScores = _.map(pathArray, (eachPath) => {
+
+
+    //make sure duplicate paths not being processed
+
+    if(eachPath.d !== targetPath.d){
+
+    let eachPathCoords = eachPath.first.split(',');
+
+
+    let eachXY = [parseFloat(eachPathCoords[0]), parseFloat(eachPathCoords[1])];
+
+    let comparisonValues = [targetXY, eachXY];
+
+    console.log(comparisonValues,[[1,1],[100,100]]);
+
+    let score = {
+      target: _.omit(targetPath,['d']),
+      test: _.omit(eachPath,['d']),
+      //values: comparisonValues,
+      comparisonValues: comparisonValues,
+      distance: pointDistance(targetXY, eachXY),
+      distance2: pointDistance([1,1],[100,100])
+    }
+
+
+    //console.log(eachPath);
+    //console.log(targetPath);
+
+    console.log(score);
+    return score;
+
+    }
+
+  }); //end map
+
+  console.log(pathScores);
+
+
+}
+
 //Takes in an array of groups, returns an array of paths elements with color, stroke, first/last
 function parseGroupPaths(group){
 
   let pathArray = group.children;
 
-	//$ = cheerio.load(fs.readFileSync(filePath));
-	var paths = _.reduce($('path'), function (items, path) {
+  console.log('processing group');
+  let groupId = $(group).attr('id')
 
-    //fill-opacity="0" stroke="#9098FC" stroke-width="1"
-    let pathString = $(path).attr('d');
-    let stroke = $(path).attr('stroke');
-    let strokeWidth = $(path).attr('stroke-width');
+	var paths = _.reduce($('path'), function (items, path, key) {
 
-
-    let pathPieces = _.without(_.split(pathString,' '),'')
+    //Trim and explode, then turn multipath pathstrings into array of paths
+    let pathPieces = _.without(_.split($(path).attr('d'),' '),'')
     let separatedPaths = seperatePaths(pathPieces)
 
+    let firstPiece = _.first(separatedPaths);
+    let lastPiece = _.last(separatedPaths);
+
+    console.log(firstPiece);
+    process.exit();
+
     let pathObj = {
-      //pieces: pathPieces,
-      separated: separatedPaths,
-      //d: pathString,
-      stroke: stroke,
-      strokeWidth: strokeWidth
+      id: `${groupId}-${key}`,
+      //separated: separatedPaths,
+      points: separatedPaths.length,
+      d: $(path).attr('d'),
+      stroke: $(path).attr('stroke'),
+      strokeWidth: $(path).attr('stroke-width'),
+      first: firstPiece.replace(/[A-Z]+/,''),
+      last: lastPiece.replace(/[A-Z]+/,''),
     }
+
+    //console.log(pathObj)
+    //process.exit();
 
     items.push(pathObj);
 		return items
 	}, [])
 
   //Collect all groups paths together into one array
-  let groupPaths = _.reduce(paths, function(allPaths, group){
-    console.log(group.separated);
-    //allPaths.push(group.separated);
-    //return allPaths;
-  })
+  // let groupPaths = _.reduce(paths, function(allPaths, group){
+  //   //console.log(group.separated);
+  //   //allPaths.push(group.separated);
+  //   //return allPaths;
+  // })
+
+
+  //Arrange paths in sequence optimal for pen plotter
+  let orderedPaths = orderPaths(paths);
 
   let groupObj = {
     strokeColor : paths[0].stroke,
     strokeWidth : paths[0].strokeWidth,
-    paths: groupPaths
+    paths: paths
   }
 
-  console.log(groupObj);
+  //console.log(groupObj);
   process.exit();
 
 	return paths

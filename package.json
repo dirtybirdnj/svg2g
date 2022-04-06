@@ -17,6 +17,7 @@
     "minimist": "^1.2.6",
     "normalize-svg-path": "1.1.0",
     "parse-svg-path": "0.1.2",
+    "point-distance": "^1.0.0",
     "simplify-js": "1.2.4",
     "svg-path-shapes": "0.0.2",
     "svg-replace-bezier": "0.0.3",
