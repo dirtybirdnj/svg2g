@@ -195,12 +195,14 @@ function findClosestPath(targetPath,pathArray){
 
     if(eachPath.d !== targetPath.d){
 
-    let eachPathCoords = eachPath.first.split(',');
+    let eachPathCoordsStart = eachPath.first.split(',');
+    let eachPathCoordsEnd = eachPath.last.split(',');
 
 
-    let eachXY = [parseFloat(eachPathCoords[0]), parseFloat(eachPathCoords[1])];
+    let eachStartXY = [parseFloat(eachPathCoordsStart[0]), parseFloat(eachPathCoordsStart[1])];
+    let eachEndXY = [parseFloat(eachPathCoordsEnd[0]), parseFloat(eachPathCoordsEnd[1])];
 
-    let comparisonValues = [targetXY, eachXY];
+    let comparisonValues = [targetXY, eachStartXY, eachEndXY];
 
     console.log(comparisonValues,[[1,1],[100,100]]);
 
@@ -209,8 +211,8 @@ function findClosestPath(targetPath,pathArray){
       test: _.omit(eachPath,['d']),
       //values: comparisonValues,
       comparisonValues: comparisonValues,
-      distance: pointDistance(targetXY, eachXY),
-      distance2: pointDistance([1,1],[100,100])
+      distanceStart: pointDistance(targetXY, eachStartXY),
+      distanceEnd: pointDistance(targetXY, eachEndXY)
     }
 
 
@@ -245,9 +247,6 @@ function parseGroupPaths(group){
 
     let firstPiece = _.first(separatedPaths);
     let lastPiece = _.last(separatedPaths);
-
-    console.log(firstPiece);
-    process.exit();
 
     let pathObj = {
       id: `${groupId}-${key}`,
